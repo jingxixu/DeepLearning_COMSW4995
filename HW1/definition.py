@@ -17,6 +17,7 @@ class NeuralNetwork(object):
         self.num_layers = len(layer_dimensions)
         self.drop_prob = drop_prob
         self.reg_lambda = reg_lambda
+        self.status = 'train'
         self.X_val = None
         self.y_val = None
         
@@ -33,8 +34,12 @@ class NeuralNetwork(object):
         the number of samples
         :returns: the affine product WA + b, along with the cache required for the backward pass
         """
+        M = None
+        if self.status == 'train' and self.drop_prob > 0:
+            # dropout only when training
+            A, M = self.dropout(A, self.drop_prob)
         Z = np.dot(W, A) + b
-        cache = (A, W, b, Z)
+        cache = (A, W, b, Z, M)
         return Z, cache
 
     def activationForward(self, A, activation="relu"):
@@ -60,7 +65,9 @@ class NeuralNetwork(object):
             A is matrix after applying dropout
             M is dropout mask, used in the backward pass
         """
-        # todo
+        M = np.random.uniform(size = A.shape)
+        M = (M > prob) / (1 - prob)
+        A = A * M
         return A, M
 
     def forwardPropagation(self, X):
@@ -74,6 +81,7 @@ class NeuralNetwork(object):
             cache is cached values for each layer that
                      are needed in further steps
         """
+        
         cache = {}
         A = X
         for l in range(1, self.num_layers):
@@ -92,15 +100,17 @@ class NeuralNetwork(object):
         :param alpha: regularization parameter
         :returns cost, dAL: A scalar denoting cost and the gradient of cost
         """
+        assert (self.status == 'train')
         # compute loss
         S = AL.shape[1]
         probs = np.exp(AL - np.max(AL, axis=0, keepdims=True))
         probs /= np.sum(probs, axis=0, keepdims=True)
         cost = -np.sum(np.log(probs[y, np.arange(S)])) / S
         
-#         if self.reg_lambda > 0:
-#             # add regularization
-       
+        if self.reg_lambda > 0:
+            # add regularization
+            for l in range(1, self.num_layers):
+                cost += 0.5 * self.reg_lambda * np.sum(np.power(self.parameters[('W', l)], 2))
         dAL = probs.copy()
         dAL[y, np.arange(S)] -= 1
         dAL /= S
@@ -118,7 +128,7 @@ class NeuralNetwork(object):
 #        A = cache[0]
 #        W = cache[1]
 #        b = cache[2]
-        A, W, b, Z = cache
+        A, W, b, Z, M = cache
         S = A.shape[1]
         
         dZ = self.activationBackward(dA_prev, cache)
@@ -136,7 +146,6 @@ class NeuralNetwork(object):
         In this case, it's just relu. 
         """
         return self.relu_derivative(dA, cache[3]) # cache[3] == Z[l]
-        # return self.relu_derivative(dA, cache[0]) 
         
     def relu_derivative(self, dx, cached_x):
         out = np.maximum(0, cached_x)
@@ -145,8 +154,8 @@ class NeuralNetwork(object):
         return dx
 
     def dropout_backward(self, dA, cache):
-        # todo
-        return dA
+        A, W, b, Z, M = cache
+        return dA * M # cache[4] = M
 
     def backPropagation(self, dAL, Y, cache):
         """
@@ -156,20 +165,21 @@ class NeuralNetwork(object):
         :param cache: cached values during forwardprop
         :returns gradients: dW and db for each weight/bias
         """
+        assert (self.status == 'train')
         gradients = {}
         dA = dAL
         for l in range(self.num_layers-1, 0, -1):
+            dA, dW, db = self.affineBackward(dA, cache[l])
             if self.drop_prob > 0:
                 dA = self.dropout_backward(dA, cache[l])
-            dA, dW, db = self.affineBackward(dA, cache[l])
             # assert (dW.shape == self.parameters[('W', l)].shape), '{} - {}'.format(dW.shape, self.parameters[('W', l)].shape)
             # assert (db.shape == self.parameters[('b', l)].shape), '{} - {}'.format(db.shape, self.parameters[('b', l)].shape)
             gradients[('W', l)] = dW
-            gradients[('b', l)] = db
+            # gradients[('b', l)] = db # should b be regularized ?
             if self.reg_lambda > 0:
                 # add gradients from L2 regularization to each dW
-                gradients[('W', l)] += reg_lambda * self.parameters[('W', l)]
-                gradients[('b', l)] += reg_lambda * self.parameters[('b', l)]
+                gradients[('W', l)] += self.reg_lambda * self.parameters[('W', l)]
+               #  gradients[('b', l)] += reg_lambda * self.parameters[('b', l)]
         return gradients
 
     def updateParameters(self, gradients, alpha):
@@ -190,6 +200,7 @@ class NeuralNetwork(object):
         :param print_every: no. of iterations to print debug info after
         """
         assert (alpha * self.reg_lambda < 1)
+        self.status = 'train'
         self.parameters['mean'] = np.mean(X, axis = 1, keepdims = True)
         self.parameters['var'] = np.var(X, axis = 1, keepdims = True)
         X = (X - self.parameters['mean']) / np.sqrt(self.parameters['var'])
@@ -217,9 +228,11 @@ class NeuralNetwork(object):
         """
         Make predictions for each sample
         """
+        self.status = 'predict'
         X = (X - self.parameters['mean']) / np.sqrt(self.parameters['var'])
         AL, _ = self.forwardPropagation(X)
         y_pred = np.argmax(AL, axis = 0)
+        self.status = 'train'
         return y_pred
 
     def get_batch(self, X, y, batch_size):
