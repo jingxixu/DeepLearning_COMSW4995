@@ -15,8 +15,8 @@ class NeuralNetwork(object):
         
         self.parameters = {}
         self.num_layers = len(layer_dimensions)
-#         self.drop_prob = 
-#         self.reg_lambda =
+        self.drop_prob = drop_prob
+        self.reg_lambda = reg_lambda
         self.X_val = None
         self.y_val = None
         
@@ -145,6 +145,7 @@ class NeuralNetwork(object):
         return dx
 
     def dropout_backward(self, dA, cache):
+        # todo
         return dA
 
     def backPropagation(self, dAL, Y, cache):
@@ -158,18 +159,17 @@ class NeuralNetwork(object):
         gradients = {}
         dA = dAL
         for l in range(self.num_layers-1, 0, -1):
-#             if self.drop_prob > 0:
-#                 #call dropout_backward
-            # dZ = self.activationBackward(dA, cache[l])
-            # dA, dW, db = self.affineBackward(dZ, cache[l])
+            if self.drop_prob > 0:
+                dA = self.dropout_backward(dA, cache[l])
             dA, dW, db = self.affineBackward(dA, cache[l])
-            assert (dW.shape == self.parameters[('W', l)].shape), '{} - {}'.format(dW.shape, self.parameters[('W', l)].shape)
-            assert (db.shape == self.parameters[('b', l)].shape), '{} - {}'.format(db.shape, self.parameters[('b', l)].shape)
+            # assert (dW.shape == self.parameters[('W', l)].shape), '{} - {}'.format(dW.shape, self.parameters[('W', l)].shape)
+            # assert (db.shape == self.parameters[('b', l)].shape), '{} - {}'.format(db.shape, self.parameters[('b', l)].shape)
             gradients[('W', l)] = dW
             gradients[('b', l)] = db
-            
-#         if self.reg_lambda > 0:
-#             # add gradients from L2 regularization to each dW
+            if self.reg_lambda > 0:
+                # add gradients from L2 regularization to each dW
+                gradients[('W', l)] += reg_lambda * self.parameters[('W', l)]
+                gradients[('b', l)] += reg_lambda * self.parameters[('b', l)]
         return gradients
 
     def updateParameters(self, gradients, alpha):
@@ -189,6 +189,7 @@ class NeuralNetwork(object):
         :param batch_size: number of samples in a minibatch
         :param print_every: no. of iterations to print debug info after
         """
+        assert (alpha * self.reg_lambda < 1)
         self.parameters['mean'] = np.mean(X, axis = 1, keepdims = True)
         self.parameters['var'] = np.var(X, axis = 1, keepdims = True)
         X = (X - self.parameters['mean']) / np.sqrt(self.parameters['var'])
@@ -209,7 +210,7 @@ class NeuralNetwork(object):
                 if self.X_val is not None:
                     val_acc = self.score(self.predict(self.X_val), self.y_val)
                 else:
-                    val_acc = '-'
+                    val_acc = np.nan
                 print('iter={:5}, cost={:.4f}, trn_acc={:.4f}, val_acc={:.4f}'.format(i, cost, trn_acc, val_acc))
                 
     def predict(self, X):
