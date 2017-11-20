@@ -1,2 +1,7 @@
 HW*/cifar10*
 .DS_Store
+proj/code/ipynb_checkpoints
+proj/models
+proj/result
+proj/input
+proj/tmp
