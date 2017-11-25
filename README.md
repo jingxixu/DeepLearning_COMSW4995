@@ -9,4 +9,4 @@ This is the homework repository for Deep Learning at Columbia University
 
 # Final Project
 
-The final project is in the `proj/` folder with specific README inside.
+The final project is in the `Project/` folder with specific README inside.
