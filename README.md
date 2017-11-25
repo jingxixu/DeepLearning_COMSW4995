@@ -6,3 +6,7 @@ This is the homework repository for Deep Learning at Columbia University
 - Yu Wang (yw3025)
 - Kaho Chan (kc3137)
 - Jingxi Xu (jx2324)
+
+# Final Project
+
+The final project is in the `proj/` folder with specific README inside.
