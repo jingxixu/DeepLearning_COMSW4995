@@ -1,7 +1,11 @@
 # Files
 
-`source/Preprocessing & Simple Experiments.ipynb` The basic experiments with logistic regression.
+`source/simple_logistic_regression.ipynb` A simple model using logistic regression.
 
-`source/wide&deep.ipynb` Experiments for the wide&deep network.
+`source/wide_and_deep.ipynb` The the wide&deep model.
 
-`source/simple_lgbm.ipynb` The experiments with gradient boosting using package `lgbm`
+`source/simple_lgbm.ipynb` A simple model using gradient boosting with package `lgbm`
+
+`proposal.pdf` The research proposal for this project.
+
+`milestone.pdf` The milestone report for this project.
