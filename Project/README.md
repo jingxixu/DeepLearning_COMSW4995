@@ -10,4 +10,4 @@
 
 `milestone.pdf` The milestone report for this project.
 
-`example_feature.csv` The whole feature generated after feature engineering, only contain first 5 columns in all training set.
+`example_feature.csv` The whole feature generated after feature engineering, only contains first 5 columns in all training set.
