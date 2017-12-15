@@ -5,7 +5,7 @@ The codes presents the code for the major models mentioned in the final report. 
 - `source/wide_and_deep.ipynb` The wide&deep model.
 - `source/Content-based DNN.ipynb` 
     - The Content-based DNN as mentioned in the final report
-    - The DNN with uid and sid that achieves the best result is also appended in this ipynb
+    - The DNN with uid and sid that achieves the best result is also included in this ipynb
 - `source/simple_logistic_regression.ipynb` A simple model using logistic regression
 - `source/simple_lgbm.ipynb` A simple model using gradient boosting with package `lgbm`
 - `proposal.pdf` The research proposal for this project.
