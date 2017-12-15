@@ -1,6 +1,6 @@
 # Files
 
-The codes presents the code for the major models mentioned in the final report. We have not included all the experiments we have tried in the repository to keep the repository clean and the code readable. 
+The following files present the code for the major models mentioned in the final report. We have not included all the experiments we have tried in the repository to keep the repository clean and the code readable. 
 
 - `source/wide_and_deep.ipynb` The wide&deep model.
 - `source/Content-based DNN.ipynb` 
