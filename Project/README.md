@@ -8,6 +8,7 @@ The following files present the code for the major models mentioned in the final
     - __The DNN with uid and sid that achieves the best result is also included in this ipynb__
 - `source/simple_logistic_regression.ipynb` A simple model using logistic regression
 - `source/simple_lgbm.ipynb` A simple model using gradient boosting with package `lgbm`
-- `proposal.pdf` The research proposal for this project.
-- `milestone.pdf` The milestone report for this project.
-- `example_feature.csv` The whole feature generated after feature engineering, only contains first 5 columns in all training set.
+- `proposal.pdf` The research proposal of this project.
+- `milestone.pdf` The milestone report of this project.
+- `final report.pdf` The final report of this project.
+- `example_feature.csv` The whole feature generated after feature engineering, only contains first 5 columns in all training set
